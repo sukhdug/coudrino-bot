@@ -1,0 +1,26 @@
+{
+  "name": "cloudrino-bot",
+  "version": "1.0.0",
+  "description": "Simple Telegram Bot to check the queue on Clodrino.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidepedranz/coudrino-bot.git"
+  },
+  "keywords": [
+    "telegram",
+    "cloudrino"
+  ],
+  "author": "Davide Pedranz",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/davidepedranz/coudrino-bot/issues"
+  },
+  "homepage": "https://github.com/davidepedranz/coudrino-bot#readme",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.14.0"
+  }
+}
