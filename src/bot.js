@@ -34,44 +34,50 @@ if (webHook) {
 }
 
 // get bot name
-bot.getMe().then(function (me) {
+bot.getMe()
+    .then(function (me) {
 
-    // save bot name
-    var myName = '@' + me.username;
+        // save bot name
+        var myName = '@' + me.username;
 
-    // reply to text messages
-    bot.on('text', function (msg) {
+        // reply to text messages
+        bot.on('text', function (msg) {
 
-        // parse command (eg. /start@CloudrinoBot => /start)
-        var command = msg.text.replace(myName, '');
+            // parse command (eg. /start@CloudrinoBot => /start)
+            var command = msg.text.replace(myName, '');
 
-        // reply
-        switch (command) {
+            // reply
+            switch (command) {
 
-            case '/start':
-                bot.sendMessage(msg.chat.id, 'Start');
-                break;
+                case '/start':
+                    bot.sendMessage(msg.chat.id, 'Start');
+                    break;
 
-            case '/test':
-                new CloudrinoClient()
-                    .getPosition('davide.pedranz@gmail.com')
-                    .then(function (o) {
-                        bot.sendMessage(msg.chat.id, '#' + o.position + ' of #' + o.total);
-                    })
-                    .catch(errors.PositionNotFound, function (e) {
-                        bot.sendMessage(msg.chat.id, 'Email not found');
-                    })
-                    .catch(function (e) {
-                        bot.sendMessage(msg.chat.id, 'Unknown error, probably Cloudrino has changed something...');
-                    });
-                break;
+                case '/test':
+                    new CloudrinoClient()
+                        .getPosition('davide.pedranz@gmail.com')
+                        .then(function (o) {
+                            bot.sendMessage(msg.chat.id, '#' + o.position + ' of #' + o.total);
+                        })
+                        .catch(errors.PositionNotFound, function (e) {
+                            bot.sendMessage(msg.chat.id, 'Email not found');
+                        })
+                        .catch(function (e) {
+                            bot.sendMessage(msg.chat.id, 'Unknown error, probably Cloudrino has changed something...');
+                        });
+                    break;
 
-            default:
-                bot.sendMessage(msg.chat.id, 'Unknown command');
-                break;
-        }
+                default:
+                    bot.sendMessage(msg.chat.id, 'Unknown command');
+                    break;
+            }
+        });
+
+        // debug message
+        console.info('# running... Press Ctrl+C to exit'.replace('#', myName));
+    })
+    .catch(function (e) {
+        console.error('Error starting the Bot... maybe the TOKEN is wrong?');
+        console.error(e);
+        process.exit(1);
     });
-
-    // debug message
-    console.info("# running... Press Ctrl+C to exit".replace('#', myName));
-});
