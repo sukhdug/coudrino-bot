@@ -8,7 +8,7 @@ var errors = require('./errors');
 // env variables
 var token = process.env.TOKEN;
 var port = process.env.PORT || 5000;
-var webHook = process.env.WEBHOOK || false;
+var ip = process.env.IP;
 
 // check variables
 if (!token) {
@@ -18,7 +18,7 @@ if (!token) {
 
 // set bot mode (polling vs webHook) depending ok the environment
 var options = {};
-if (webHook) {
+if (ip) {
     options.webHook = {
         port: port,
         host: '0.0.0.0'
@@ -29,8 +29,8 @@ if (webHook) {
 
 // create Bot
 var bot = new TelegramBot(token, options);
-if (webHook) {
-    bot.setWebHook(domain + ':443/bot' + token);
+if (ip) {
+    bot.setWebHook(ip + ':443/bot' + token);
 }
 
 // get bot name
