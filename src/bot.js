@@ -2,6 +2,8 @@
 
 // dependencies
 var TelegramBot = require('node-telegram-bot-api');
+var CloudrinoClient = require('./clodrino-client');
+var errors = require('./errors');
 
 // env variables
 var token = process.env.TOKEN;
@@ -48,6 +50,20 @@ bot.getMe().then(function (me) {
 
             case '/start':
                 bot.sendMessage(msg.chat.id, 'Start');
+                break;
+
+            case '/test':
+                new CloudrinoClient()
+                    .getPosition('davide.pedranz@gmail.com')
+                    .then(function (o) {
+                        bot.sendMessage(msg.chat.id, '#' + o.position + ' of #' + o.total);
+                    })
+                    .catch(errors.PositionNotFound, function (e) {
+                        bot.sendMessage(msg.chat.id, 'Email not found');
+                    })
+                    .catch(function (e) {
+                        bot.sendMessage(msg.chat.id, 'Unknown error, probably Cloudrino has changed something...');
+                    });
                 break;
 
             default:
