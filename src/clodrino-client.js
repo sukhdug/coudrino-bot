@@ -1,8 +1,8 @@
 'use strict';
 
 // dependencies
-var Promise = require('bluebird');
-var request = Promise.promisify(require('request'));
+var bluebird = require('bluebird');
+var request = bluebird.promisify(require('request'));
 var errors = require('./errors');
 
 var CloudrinoClient = function () {
