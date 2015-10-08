@@ -50,7 +50,9 @@ bot.getMe()
             switch (command) {
 
                 case '/start':
-                    bot.sendMessage(msg.chat.id, 'Start');
+                    bot.sendMessage(msg.chat.id,
+                        'Welcome! This simple bot allows to check the queue on Cloudrino.net\n' +
+                        'Explain commands... TODO');
                     break;
 
                 case '/test':
@@ -78,6 +80,5 @@ bot.getMe()
     })
     .catch(function (e) {
         console.error('Error starting the Bot... maybe the TOKEN is wrong?');
-        console.error(e);
         process.exit(1);
     });
