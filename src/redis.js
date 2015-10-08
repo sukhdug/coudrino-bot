@@ -10,7 +10,7 @@ bluebird.promisifyAll(redis.Multi.prototype);
 var Status = require('./status');
 
 // constants
-var STATUS = 'xstatus_';
+var STATUS = 'status_';
 var EMAILS = 'emails_';
 
 // constructor
