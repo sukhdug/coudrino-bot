@@ -24,6 +24,7 @@
   "homepage": "https://github.com/davidepedranz/coudrino-bot#readme",
   "dependencies": {
     "bluebird": "^2.10.2",
+    "codacy-coverage": "^1.1.3",
     "node-telegram-bot-api": "^0.14.0",
     "redis": "^2.1.0",
     "request": "^2.64.0"
