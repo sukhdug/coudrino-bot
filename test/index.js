@@ -84,7 +84,7 @@ describe('RedisClient', function () {
         it('should not add a not existing email', function (done) {
             redis.addEmail(CHAT, 'existing@example.com')
                 .then(function () {
-                    return redis.addEmail(CHAT, 'existing@example.com')
+                    return redis.addEmail(CHAT, 'existing@example.com');
                 })
                 .then(function (addedSecond) {
                     // check if the email was not added
