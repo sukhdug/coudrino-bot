@@ -15,7 +15,7 @@ var Status = require('./status');
 
 // check variables
 if (!token) {
-    console.error("Please add a TOKEN env variable with the TelegramBot token");
+    console.error('Please add a TOKEN env variable with the TelegramBot token');
     process.exit(1);
 }
 
@@ -84,7 +84,7 @@ bot.getMe()
                                 .then(function (o) {
                                     return email + ' -> #' + o.position + ' of #' + o.total;
                                 })
-                                .catch(errors.PositionNotFound, function (e) {
+                                .catch(errors.PositionNotFound, function () {
                                     return email + ' not found';
                                 });
                         })
@@ -94,7 +94,7 @@ bot.getMe()
                             }, '');
                             bot.sendMessage(chatID, msg);
                         })
-                        .catch(function (e) {
+                        .catch(function () {
                             bot.sendMessage(chatID, 'Unknown error, probably Cloudrino has changed something...');
                         });
                     break;
@@ -126,7 +126,7 @@ bot.getMe()
         // debug message
         console.info('# running... Press Ctrl+C to exit'.replace('#', myName));
     })
-    .catch(function (e) {
+    .catch(function () {
         console.error('Error starting the Bot... maybe the TOKEN is wrong?');
         process.exit(1);
     });
