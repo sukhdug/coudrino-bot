@@ -34,7 +34,10 @@ RedisClient.prototype.setStatus = function (chat, status) {
 };
 
 RedisClient.prototype.addEmail = function (user, email) {
-    return this.client.saddAsync(EMAILS + user, email);
+    return this.client.saddAsync(EMAILS + user, email)
+        .then(function (number) {
+            return number ? true : false;
+        });
 };
 
 RedisClient.prototype.getEmails = function (user) {
