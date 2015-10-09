@@ -7,16 +7,15 @@ environment:
   - nodejs_version: '1.0'
 
 install:
+  # Install the Redis
+  - nuget install redis-64 -excludeversion
+  - redis-64\redis-server.exe --service-install
+  - redis-64\redis-server.exe --service-start
+  - '@ECHO Redis Started'
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
   # install modules
   - npm install
-
-before_build:
-  # install redis
-  - nuget install redis-64 -excludeversion
-  - redis-64\redis-server.exe --service-install
-  - redis-64\redis-server.exe --service-start
 
 test_script:
   - node --version
@@ -24,4 +23,5 @@ test_script:
   - npm test
 
 build: off
+version: '{build}'
 
