@@ -1,5 +1,6 @@
 # @CoudrinoBot
 [![Build Status](https://travis-ci.org/davidepedranz/coudrino-bot.svg)](https://travis-ci.org/davidepedranz/coudrino-bot)
+[![Build status](https://ci.appveyor.com/api/projects/status/y5567plvqjlkbnue?svg=true)](https://ci.appveyor.com/project/davidepedranz/coudrino-bot)
 [![Coverage Status](https://coveralls.io/repos/davidepedranz/coudrino-bot/badge.svg?branch=master&service=github)](https://coveralls.io/github/davidepedranz/coudrino-bot?branch=master)
 
 [![Code Climate](https://codeclimate.com/github/davidepedranz/coudrino-bot/badges/gpa.svg)](https://codeclimate.com/github/davidepedranz/coudrino-bot)
