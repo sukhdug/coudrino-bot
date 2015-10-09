@@ -5,7 +5,7 @@
   "main": "src/bot.js",
   "scripts": {
     "start": "node src/bot.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/mocha test/index.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,9 @@
     "node-telegram-bot-api": "^0.14.0",
     "redis": "^2.1.0",
     "request": "^2.64.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.3"
   },
   "private": true
 }

@@ -18,6 +18,10 @@ var RedisClient = function (url) {
     this.client = redis.createClient(url);
 };
 
+RedisClient.prototype.clear = function () {
+    return this.client.flushallAsync();
+};
+
 RedisClient.prototype.getStatus = function (chat) {
     return this.client.getAsync(STATUS + chat)
         .then(function (status) {
