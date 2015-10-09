@@ -11,6 +11,9 @@ pids
 # Dependency directory
 node_modules
 
+# coverage Istambul
+coverage/
+
 # WebStorm
 .idea
 *.iml

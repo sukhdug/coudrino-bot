@@ -5,7 +5,8 @@
   "main": "src/bot.js",
   "scripts": {
     "start": "node src/bot.js",
-    "test": "./node_modules/.bin/mocha test/index.js"
+    "test": "./node_modules/.bin/mocha",
+    "coverage": "./node_modules/.bin/istanbul cover _mocha --include-all-sources"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,8 @@
     "request": "^2.64.0"
   },
   "devDependencies": {
+    "codeclimate-test-reporter": "^0.1.1",
+    "istanbul": "^0.3.22",
     "mocha": "^2.3.3"
   },
   "private": true
