@@ -1,7 +1,27 @@
+environment:
+  matrix:
+  # node.js
+  - nodejs_version: '4.1'
+  - nodejs_version: '4.0'
+  # io.js
+  - nodejs_version: '1.0'
+
+install:
+  # Get the latest stable version of Node.js or io.js
+  - ps: Install-Product node $env:nodejs_version
+  # install modules
+  - npm install
+
 before_build:
+  # install redis
   - nuget install redis-64 -excludeversion
   - redis-64\redis-server.exe --service-install
   - redis-64\redis-server.exe --service-start
 
 test_script:
+  - node --version
+  - npm --version
   - npm run coverage
+
+build: off
+
