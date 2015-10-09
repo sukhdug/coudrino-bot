@@ -1,18 +1,19 @@
 language: node_js
 node_js:
-- '4.1'
-- '4.0'
-- iojs
+  - '4.1'
+  - '4.0'
+  - iojs
 script: npm run coverage
+
 services:
-- redis-server
-after_script:
-- "./node_modules/.bin/codeclimate-test-reporter < coverage/lcov.info"
-- cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
-- cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage
-addons:
-  code_climate:
-    repo_token: e2f82698af84edf290f4a96bb9ee40d4848fa60d36642e44df3cae7b36e2af92
+  - redis-server
+
 env:
   global:
-    secure: OVS5mbTcMNmzkD/wxPswGY2D61RCwvdit7zaUdFc1RWpKm8vGhxEeNSrhfR8Hb8EfB46TEifZcnXXKdwnivG4yvqG2WQPugysWt8dArnK3Yr84oc0fAEX5YCeW8sa9X5fl7cHsS6SxOPFwb/Iz95TnCp5rOEkckdfL3RVFs5gwj2qhq26nhNRZa1H0kMM4Dyk3kUNCXDwEflvP3xK3iRlPOgNWEIHLoas2saxtBENVF5y6YiaBM344CCh9fW1rqBgwqW8SiNLsRk0b05cDzYbVuCSpWwcAo1QtaVPnp/Rb+kdB0xM5EPSlzOiVYeZCJzStWWT+Wk5JWrzaSF1VROdcMPBTdXtagAGJ9+rHb8SjGpYgdNJBtWWQZLP9uRhkRfRtNXNjOWvSTmXI+lvYbnhw3/ubNbB3BQsUhRlwQMIfee6m9wdyNFK98tlJJy/2TddzOEtO+D5TmFpXSKrQNFAnCsd2SyxJ36ankHaqK25C+X8iuuS9sJgH//UfvhaHx2WvLWWBDEcf2rmH4Tq8q6bOYqwmTAK9JANMR1sjuLt0O1/ZapX7Y1t2UPt1yH0YqK87WOdIgV5QjYFXc2xZNEFQuOwNURO72YVNyQ89DFKtYGgLVabGVljlhps2UbJDkNXXcjdxrXnrrlCGuiq+QsTxUNhWMkbfya597zGgoK36g=
+   - secure: OVS5mbTcMNmzkD/wxPswGY2D61RCwvdit7zaUdFc1RWpKm8vGhxEeNSrhfR8Hb8EfB46TEifZcnXXKdwnivG4yvqG2WQPugysWt8dArnK3Yr84oc0fAEX5YCeW8sa9X5fl7cHsS6SxOPFwb/Iz95TnCp5rOEkckdfL3RVFs5gwj2qhq26nhNRZa1H0kMM4Dyk3kUNCXDwEflvP3xK3iRlPOgNWEIHLoas2saxtBENVF5y6YiaBM344CCh9fW1rqBgwqW8SiNLsRk0b05cDzYbVuCSpWwcAo1QtaVPnp/Rb+kdB0xM5EPSlzOiVYeZCJzStWWT+Wk5JWrzaSF1VROdcMPBTdXtagAGJ9+rHb8SjGpYgdNJBtWWQZLP9uRhkRfRtNXNjOWvSTmXI+lvYbnhw3/ubNbB3BQsUhRlwQMIfee6m9wdyNFK98tlJJy/2TddzOEtO+D5TmFpXSKrQNFAnCsd2SyxJ36ankHaqK25C+X8iuuS9sJgH//UfvhaHx2WvLWWBDEcf2rmH4Tq8q6bOYqwmTAK9JANMR1sjuLt0O1/ZapX7Y1t2UPt1yH0YqK87WOdIgV5QjYFXc2xZNEFQuOwNURO72YVNyQ89DFKtYGgLVabGVljlhps2UbJDkNXXcjdxrXnrrlCGuiq+QsTxUNhWMkbfya597zGgoK36g=
+   - secure: 01SGbb56N3wbM4g42GNiahqm6it0mkYUZ9QyGN9tn++X2Llzt7YBpG7TZbVV6OSurkF9Mv12vuNix0kOhnKOlSjtKLTVH3hlA8lEhFitYSMVrhNRZeb2QgyMEXyI/sY962BjKWbArJzONXv5pr11CM4W1O6JJhC/OxI+U4jzTIq9v2yiGYYXVPem6Gjl8VctHnvOT3DGIozFFATXjH08uNu2H8X7yicd92Ha4fzMBvZrfmQqoj01z/d2PKmzsOxVvNMWv0gMF1F2TF0k2bQ5VMxkTXSfFqg9jxbQj7SxB5gWR35rRN2I5u1rSfw6nHTc4yItxWhP9Kr8T6bxMIFdp1LmiAlEteb8m5w5TsjwT3EL/86jIYkDtMbp2MCUxNyxHkGYzgewXc2cz/g0sA1Hj7iYIPPZF4spkRcdWuOGtH7/u+N16iZvdsPHC23JQUsvonJBpwxsGGHO2lpe01GBzTVRagxoctJdCi3ohd7CTP8SOBKzUL3yo9rdBHpT7TVnH9bVYwnZ3VCRL2AcyPinKKE3KH6DwGT/vRl71v2dXjxHgjo8xqqnmtSvYyyZzBOnK8D57MTYlOw26AMjZHLmmOKMjoJk3lxTnq9U8AQzXfc7BL5zGRBBsUvb7LGjc4jnREVLqdO11sf9oDTF7PNbozRWr/LlfBS7q4sghhQ+Cu8=
+
+after_script:
+  - cat ./coverage/lcov.info | ./node_modules/.bin/codeclimate-test-reporter
+  - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+  - cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage
