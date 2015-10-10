@@ -5,8 +5,8 @@ var bluebird = require('bluebird');
 var request = bluebird.promisify(require('request'));
 var errors = require('./errors');
 
-var CloudrinoClient = function () {
-    this.address = 'https://www.cloudrino.net/index.php?error=1&email=';
+var CloudrinoClient = function (address) {
+    this.address = address || 'https://www.cloudrino.net/index.php?error=1&email=';
 };
 
 CloudrinoClient.prototype._transformResponse = function (body) {
@@ -26,7 +26,14 @@ CloudrinoClient.prototype._doRequest = function (email) {
         method: 'GET'
     };
 
-    return request(options);
+    return request(options)
+        .then(function (a, b, c) {
+            var response = a[0];
+            if (response.statusCode >= 400) {
+                throw new Error('HTTP error: ' + response.statusCode);
+            }
+            return response.body;
+        });
 };
 
 CloudrinoClient.prototype.getPosition = function (email) {
