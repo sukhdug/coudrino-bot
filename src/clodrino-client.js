@@ -27,8 +27,8 @@ CloudrinoClient.prototype._doRequest = function (email) {
     };
 
     return request(options)
-        .then(function (a, b, c) {
-            var response = a[0];
+        .then(function (responses) {
+            var response = responses[0];
             if (response.statusCode >= 400) {
                 throw new Error('HTTP error: ' + response.statusCode);
             }
