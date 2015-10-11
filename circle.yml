@@ -1,0 +1,6 @@
+machine:
+  services:
+    - redis
+test:
+  override:
+    - npm run coverage
