@@ -35,7 +35,8 @@
     "coveralls": "^2.11.4",
     "express": "^4.13.3",
     "istanbul": "^0.3.22",
-    "mocha": "^2.3.3"
+    "mocha": "^2.3.3",
+    "sinon": "^1.17.1"
   },
   "private": true
 }
