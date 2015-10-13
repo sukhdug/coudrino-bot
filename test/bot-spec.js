@@ -1,10 +1,10 @@
 'use strict';
 
 // testing tools
-var chai = require("chai"),
+var chai = require('chai'),
     assert = chai.assert;
 var sinon = require('sinon');
-sinon.assert.expose(chai.assert, {prefix: ""});
+sinon.assert.expose(chai.assert, {prefix: ''});
 
 // dependencies
 var Messages = require('../src/messages');

@@ -63,6 +63,16 @@ describe('RedisClient', function () {
         });
     });
 
+    describe('#getEmails', function () {
+        it('should return [] if no email was added', function (done) {
+            redis.getEmails(CHAT)
+                .then(function (emails) {
+                    assert.equal(emails.length, 0);
+                    done();
+                });
+        });
+    });
+
     describe('#addEmail', function () {
         it('should add a not existing email', function (done) {
             redis.addEmail(CHAT, 'not-existing@example.com')
@@ -124,11 +134,38 @@ describe('RedisClient', function () {
         });
     });
 
-    describe('#getEmails', function () {
-        it('should return [] if no email was added', function (done) {
-            redis.getEmails(CHAT)
+    describe('#removeEmail', function () {
+        it('should not remove a not existing email', function (done) {
+            redis.removeEmail(CHAT, 'not-existing@example.com')
+                .then(function (removed) {
+                    assert.isFalse(removed);
+                })
+                .then(function () {
+                    return redis.getEmails(CHAT);
+                })
                 .then(function (emails) {
-                    assert.equal(emails.length, 0);
+                    assert.sameMembers(emails, []);
+                    done();
+                });
+        });
+        it('should remove an existing email', function (done) {
+            redis.addEmail(CHAT, 'existing-1@example.com')
+                .then(function () {
+                    return redis.addEmail(CHAT, 'existing-2@example.com');
+                })
+                .then(function () {
+                    return redis.removeEmail(CHAT, 'existing-1@example.com');
+                })
+                .then(function (removed) {
+                    assert(removed);
+                })
+                .then(function () {
+                    return redis.getEmails(CHAT);
+                })
+                .then(function (emails) {
+                    var expected = ['existing-2@example.com'];
+                    assert.sameMembers(emails, expected);
+                    assert.equal(emails.length, expected.length);
                     done();
                 });
         });
