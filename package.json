@@ -5,8 +5,8 @@
   "main": "src/bot.js",
   "scripts": {
     "start": "node src/bot.js",
-    "test": "TOKEN='token' ./node_modules/.bin/mocha",
-    "coverage": "TOKEN='token' ./node_modules/.bin/istanbul cover _mocha --include-all-sources"
+    "test": "./node_modules/.bin/mocha",
+    "coverage": "./node_modules/.bin/istanbul cover _mocha --include-all-sources"
   },
   "repository": {
     "type": "git",

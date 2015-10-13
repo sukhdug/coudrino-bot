@@ -52,6 +52,9 @@ var simulateMessage = function (bot, msg) {
     bot.emit('text', msg);
 };
 
+// inject a fake TOKEN for the bot
+process.env.TOKEN = 'token';
+
 // mock bot
 sinon.stub(TelegramBot.prototype, 'getMe')
     .returns(new Bluebird(function (resolve) {
