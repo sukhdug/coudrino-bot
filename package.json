@@ -36,7 +36,8 @@
     "express": "^4.13.3",
     "istanbul": "^0.3.22",
     "mocha": "^2.3.3",
-    "sinon": "^1.17.1"
+    "sinon": "^1.17.1",
+    "validator": "^4.1.0"
   },
   "private": true
 }

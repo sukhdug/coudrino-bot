@@ -23,7 +23,7 @@ if (!token) {
 // create DB client
 var redis = new RedisClient(redisUrl);
 
-// create Cloudrino clinet
+// create Cloudrino client
 var cloudrino = new CloudrinoClient();
 
 // set bot mode (polling vs webHook) depending ok the environment
@@ -62,8 +62,17 @@ bot.getMe()
             // reply
             switch (command) {
 
+                // show the welcome message
                 case '/start':
                     bot.sendMessage(chatID, Messages.WELCOME);
+                    break;
+
+                // cancel the current command, if any
+                case '/cancel':
+                    redis.getStatus(chatID)
+                        .then(function (status) {
+                            bot.sendMessage(chatID, status === Status.DEFAULT ? Messages.NO_ACTIVE_COMMAND : Messages.COMMAND_CANCELLED);
+                        });
                     break;
 
                 case '/add':
@@ -94,7 +103,7 @@ bot.getMe()
                             bot.sendMessage(chatID, msg);
                         })
                         .catch(function () {
-                            bot.sendMessage(chatID, 'Unknown error, probably Cloudrino has changed something...');
+                            bot.sendMessage(chatID, Messages.UNKNOWN_ERROR);
                         });
                     break;
 
@@ -106,7 +115,7 @@ bot.getMe()
                                 case Status.ADD_EMAIL:
                                     redis.addEmail(chatID, msg.text)
                                         .then(function (added) {
-                                            bot.sendMessage(chatID, added ? 'OK' : 'Email already present');
+                                            bot.sendMessage(chatID, added ? 'OK' : Messages.EMAIL_ALREADY_PRESENT);
                                         })
                                         .then(function () {
                                             redis.setStatus(chatID, Status.DEFAULT);
@@ -115,7 +124,7 @@ bot.getMe()
 
                                 default:
                                     if (/^\//.test(command)) {
-                                        bot.sendMessage(chatID, 'Unknown command');
+                                        bot.sendMessage(chatID, Messages.UNKNOWN_COMMAND);
                                     }
                             }
                         });
@@ -130,4 +139,10 @@ bot.getMe()
         process.exit(1);
     });
 
+// add function to reset the bot
+bot.reset = function () {
+    return redis.clear();
+};
+
+// export the bot for tests
 module.exports = bot;
