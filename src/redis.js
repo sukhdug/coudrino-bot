@@ -40,6 +40,13 @@ RedisClient.prototype.addEmail = function (user, email) {
         });
 };
 
+RedisClient.prototype.removeEmail = function (user, email) {
+    return this.client.sremAsync(EMAILS + user, email)
+        .then(function (number) {
+            return number ? true : false;
+        });
+};
+
 RedisClient.prototype.getEmails = function (user) {
     return this.client.smembersAsync(EMAILS + user);
 };

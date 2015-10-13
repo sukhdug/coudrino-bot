@@ -75,10 +75,35 @@ bot.getMe()
                         });
                     break;
 
+                // add a new email address
                 case '/add':
                     redis.setStatus(chatID, Status.ADD_EMAIL)
                         .then(function () {
                             bot.sendMessage(chatID, Messages.ADD_EMAIL);
+                        });
+                    break;
+
+                // remove a email address
+                case '/remove':
+                    redis.getEmails(chatID)
+                        .then(function (emails) {
+                            if (emails.length > 0) {
+                                redis.setStatus(chatID, Status.REMOVE_EMAIL)
+                                    .then(function () {
+                                        var keyboard = emails.reduce(function (accumulator, current) {
+                                            accumulator.push([current]);
+                                            return accumulator;
+                                        }, []);
+                                        bot.sendMessage(chatID, Messages.REMOVE_EMAIL, {
+                                            reply_markup: JSON.stringify({
+                                                keyboard: keyboard,
+                                                one_time_keyboard: false
+                                            })
+                                        });
+                                    });
+                            } else {
+                                bot.sendMessage(chatID, Messages.NO_EMAILS);
+                            }
                         });
                     break;
 
@@ -115,10 +140,24 @@ bot.getMe()
                                 case Status.ADD_EMAIL:
                                     redis.addEmail(chatID, msg.text)
                                         .then(function (added) {
-                                            bot.sendMessage(chatID, added ? 'OK' : Messages.EMAIL_ALREADY_PRESENT);
-                                        })
-                                        .then(function () {
+                                            bot.sendMessage(chatID, added ? Messages.OK : Messages.EMAIL_ALREADY_PRESENT);
                                             redis.setStatus(chatID, Status.DEFAULT);
+                                        });
+                                    break;
+
+                                case Status.REMOVE_EMAIL:
+                                    redis.removeEmail(chatID, msg.text)
+                                        .then(function (removed) {
+                                            if (removed) {
+                                                bot.sendMessage(chatID, Messages.OK, {
+                                                    reply_markup: JSON.stringify({
+                                                        hide_keyboard: true
+                                                    })
+                                                });
+                                                redis.setStatus(chatID, Status.DEFAULT);
+                                            } else {
+                                                bot.sendMessage(chatID, Messages.EMAIL_NOT_FOUND);
+                                            }
                                         });
                                     break;
 
