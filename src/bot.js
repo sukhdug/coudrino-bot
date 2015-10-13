@@ -12,7 +12,7 @@ var TelegramBot = require('node-telegram-bot-api');
 var CloudrinoClient = require('./clodrino-client');
 var errors = require('./errors');
 var Status = require('./status');
-var Messagges = require('./messagges');
+var Messages = require('./messages');
 
 // check variables
 if (!token) {
@@ -63,13 +63,13 @@ bot.getMe()
             switch (command) {
 
                 case '/start':
-                    bot.sendMessage(chatID, Messagges.WELCOME);
+                    bot.sendMessage(chatID, Messages.WELCOME);
                     break;
 
                 case '/add':
                     redis.setStatus(chatID, Status.ADD_EMAIL)
                         .then(function () {
-                            bot.sendMessage(chatID, Messagges.ADD_EMAIL);
+                            bot.sendMessage(chatID, Messages.ADD_EMAIL);
                         });
                     break;
 

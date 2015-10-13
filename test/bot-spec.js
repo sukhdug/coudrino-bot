@@ -5,7 +5,7 @@ var assert = require('assert');
 var sinon = require('sinon');
 
 // dependencies
-var Messagges = require('../src/messagges');
+var Messages = require('../src/messages');
 var TelegramBot = require('node-telegram-bot-api');
 var Bluebird = require('bluebird');
 var extend = require('util')._extend;
@@ -85,7 +85,7 @@ describe('bot', function () {
 
         setTimeout(function () {
             assert(sendMessage.calledOnce);
-            assert(sendMessage.calledWith(START.chat.id, Messagges.WELCOME));
+            assert(sendMessage.calledWith(START.chat.id, Messages.WELCOME));
             done();
         }, TIMEOUT);
     });
@@ -96,7 +96,7 @@ describe('bot', function () {
 
         setTimeout(function () {
             assert(sendMessage.calledOnce);
-            assert(sendMessage.calledWith(START.chat.id, Messagges.WELCOME));
+            assert(sendMessage.calledWith(START.chat.id, Messages.WELCOME));
             done();
         }, TIMEOUT);
     });
