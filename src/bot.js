@@ -7,11 +7,12 @@ var port = process.env.PORT || 5000;
 var webHook = process.env.WEHBOOK_URL;
 
 // dependencies
-var RedisClient = new require('./redis');
+var RedisClient = require('./redis');
 var TelegramBot = require('node-telegram-bot-api');
 var CloudrinoClient = require('./clodrino-client');
 var errors = require('./errors');
 var Status = require('./status');
+var Messagges = require('./messagges');
 
 // check variables
 if (!token) {
@@ -62,15 +63,13 @@ bot.getMe()
             switch (command) {
 
                 case '/start':
-                    bot.sendMessage(chatID,
-                        'Welcome! This simple bot allows to check the queue on Cloudrino\n\n' +
-                        'Explain commands... TODO');
+                    bot.sendMessage(chatID, Messagges.WELCOME);
                     break;
 
                 case '/add':
                     redis.setStatus(chatID, Status.ADD_EMAIL)
                         .then(function () {
-                            bot.sendMessage(chatID, 'OK, enter you email:');
+                            bot.sendMessage(chatID, Messagges.ADD_EMAIL);
                         });
                     break;
 
@@ -130,3 +129,5 @@ bot.getMe()
         console.error('Error starting the Bot... maybe the TOKEN is wrong?');
         process.exit(1);
     });
+
+module.exports = bot;
