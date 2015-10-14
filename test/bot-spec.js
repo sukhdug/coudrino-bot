@@ -80,59 +80,89 @@ describe('bot', function () {
         this.sinon.restore();
     });
 
-    it('#getMe() [MOCK]', function (done) {
-        bot.getMe().then(function (me) {
-            assert.equal(me, ME);
-            done();
+    describe('#getMe() [MOCK]', function () {
+        it('it should return a promise with the mock value', function (done) {
+            bot.getMe().then(function (me) {
+                assert.equal(me, ME);
+                done();
+            });
         });
     });
 
-    it('/command@Bot', function (done) {
-        var sendMessage = this.sinon.spy(bot, 'sendMessage');
-        simulateMessage(bot, '/start@' + ME.username);
+    describe('/command@Bot', function () {
+        it('it should execute the command without @Bot if it refers to this bot', function (done) {
+            var sendMessage = this.sinon.spy(bot, 'sendMessage');
+            simulateMessage(bot, '/start@' + ME.username);
 
-        later(function () {
-            assert(sendMessage.calledOnce);
-            assert(sendMessage.calledWith(CHAT_ID, Messages.WELCOME));
-            done();
+            later(function () {
+                assert.calledOnce(sendMessage);
+                assert.calledWith(sendMessage, CHAT_ID, Messages.WELCOME);
+                done();
+            });
+        });
+        it('it should do nothing if the command does not refer to this bot', function (done) {
+            var sendMessage = this.sinon.spy(bot, 'sendMessage');
+            simulateMessage(bot, '/start@NotMe');
+
+            later(function () {
+                assert.notCalled(sendMessage);
+                done();
+            });
         });
     });
 
-    it('/start', function (done) {
-        var sendMessage = this.sinon.spy(bot, 'sendMessage');
-        simulateMessage(bot, '/start');
+    describe('/start', function () {
+        it('it should send a welcome message', function (done) {
+            var sendMessage = this.sinon.spy(bot, 'sendMessage');
+            simulateMessage(bot, '/start');
 
-        later(function () {
-            assert(sendMessage.calledOnce);
-            assert(sendMessage.calledWith(CHAT_ID, Messages.WELCOME));
-            done();
+            later(function () {
+                assert.calledOnce(sendMessage);
+                assert.calledWith(sendMessage, CHAT_ID, Messages.WELCOME);
+                done();
+            });
         });
     });
 
-    it('/cancel [no active command]', function (done) {
-        var sendMessage = this.sinon.spy(bot, 'sendMessage');
-        simulateMessage(bot, '/cancel');
-
-        later(function () {
-            assert.calledOnce(sendMessage);
-            assert.calledWith(sendMessage, CHAT_ID, Messages.NO_ACTIVE_COMMAND);
-            done();
-        });
-    });
-
-    it('/cancel [active command]', function (done) {
-        var self = this;
-
-        // old state -> add email
-        simulateMessage(bot, '/add');
-
-        later(function () {
-            var sendMessage = self.sinon.spy(bot, 'sendMessage');
+    describe('/cancel', function () {
+        it('should do nothing if there is no active command', function (done) {
+            var sendMessage = this.sinon.spy(bot, 'sendMessage');
             simulateMessage(bot, '/cancel');
 
             later(function () {
                 assert.calledOnce(sendMessage);
-                assert.calledWith(sendMessage, CHAT_ID, Messages.COMMAND_CANCELLED);
+                assert.calledWith(sendMessage, CHAT_ID, Messages.NO_ACTIVE_COMMAND);
+                done();
+            });
+        });
+
+        it('should cancel the active command', function (done) {
+            var self = this;
+
+            // old state -> add email
+            simulateMessage(bot, '/add');
+
+            later(function () {
+                var sendMessage = self.sinon.spy(bot, 'sendMessage');
+                simulateMessage(bot, '/cancel');
+
+                later(function () {
+                    assert.calledOnce(sendMessage);
+                    assert.calledWith(sendMessage, CHAT_ID, Messages.COMMAND_CANCELLED);
+                    done();
+                });
+            });
+        });
+    });
+
+    describe('default', function () {
+        it('should return a help message if no command is found', function (done) {
+            var sendMessage = this.sinon.spy(bot, 'sendMessage');
+            simulateMessage(bot, '/nonExistingCommand');
+
+            later(function () {
+                assert.calledOnce(sendMessage);
+                assert.calledWith(sendMessage, CHAT_ID, Messages.UNKNOWN_COMMAND);
                 done();
             });
         });

@@ -162,7 +162,7 @@ bot.getMe()
                                     break;
 
                                 default:
-                                    if (/^\//.test(command)) {
+                                    if (new RegExp('^\/([^@])*((' + me.username + ')\s*.*)?$').test(command)) {
                                         bot.sendMessage(chatID, Messages.UNKNOWN_COMMAND);
                                     }
                             }
