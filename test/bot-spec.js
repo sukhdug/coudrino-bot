@@ -233,8 +233,10 @@ describe('bot', function () {
     });
 
     describe('/check', function () {
-        it('should print a message if there is no email to check', function () {
-            console.log('TODO... & to implement');
+        it('should print a message if there is no email to check', function (done) {
+            this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.NO_EMAILS);
+            simulateMessage(bot, '/check');
+            check(this.mock, done);
         });
         it('should check all the present emails', function (done) {
 

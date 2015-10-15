@@ -122,7 +122,7 @@ bot.getMe()
                             var msg = results.reduce(function (accumulator, current) {
                                 return accumulator + current + '\n';
                             }, '');
-                            bot.sendMessage(chatID, msg);
+                            bot.sendMessage(chatID, msg || Messages.NO_EMAILS);
                         })
                         .catch(function () {
                             bot.sendMessage(chatID, Messages.UNKNOWN_ERROR);
