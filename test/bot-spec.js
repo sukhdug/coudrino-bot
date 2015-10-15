@@ -142,7 +142,7 @@ describe('bot', function () {
         });
     });
 
-    describe('add', function () {
+    describe('/add', function () {
         it('should add a new email address', function (done) {
             this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.ADD_EMAIL);
             simulateMessage(bot, '/add');
@@ -168,6 +168,64 @@ describe('bot', function () {
                 simulateMessage(bot, EMAIL);
 
                 check(this.mock, done);
+            }.bind(this));
+        });
+    });
+
+    describe('/remove', function () {
+        it('should should prompt a message if no email is present', function (done) {
+            this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.NO_EMAILS);
+            simulateMessage(bot, '/remove');
+            check(this.mock, done);
+        });
+        it('should remove a present email', function (done) {
+
+            var EMAIL = 'present@example.com';
+
+            // insert an email
+            simulateMessage(bot, '/add');
+            simulateMessage(bot, EMAIL);
+            this.mock.expects('sendMessage').twice();
+
+            later(function () {
+
+                // try to remove another one...
+                this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.REMOVE_EMAIL);
+                simulateMessage(bot, '/remove');
+
+                later(function () {
+
+                    // ... which is present
+                    this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.OK);
+                    simulateMessage(bot, EMAIL);
+
+                    check(this.mock, done);
+
+                }.bind(this));
+            }.bind(this));
+        });
+        it('should not remove a non present email', function (done) {
+
+            // insert an email
+            simulateMessage(bot, '/add');
+            simulateMessage(bot, 'test@example.com');
+            this.mock.expects('sendMessage').twice();
+
+            later(function () {
+
+                // try to remove another one...
+                this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.REMOVE_EMAIL);
+                simulateMessage(bot, '/remove');
+
+                later(function () {
+
+                    // ... which is not present
+                    this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.EMAIL_NOT_FOUND);
+                    simulateMessage(bot, 'non-present@example.com');
+
+                    check(this.mock, done);
+
+                }.bind(this));
             }.bind(this));
         });
     });
