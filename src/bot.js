@@ -109,9 +109,6 @@ bot.getMe()
 
                 case '/all':
                     redis.getEmails(chatID)
-                        .then(function (emails) {
-                            return emails;
-                        })
                         .map(function (email) {
                             return cloudrino.getPosition(email)
                                 .then(function (o) {
