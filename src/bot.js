@@ -107,7 +107,7 @@ bot.getMe()
                         });
                     break;
 
-                case '/all':
+                case '/check':
                     redis.getEmails(chatID)
                         .map(function (email) {
                             return cloudrino.getPosition(email)
@@ -115,7 +115,7 @@ bot.getMe()
                                     return email + ' -> #' + o.position + ' of #' + o.total;
                                 })
                                 .catch(errors.PositionNotFound, function () {
-                                    return email + ' not found';
+                                    return email + Messages.X_NOT_FOUND;
                                 });
                         })
                         .then(function (results) {
@@ -127,6 +127,7 @@ bot.getMe()
                         .catch(function () {
                             bot.sendMessage(chatID, Messages.UNKNOWN_ERROR);
                         });
+
                     break;
 
                 default:

@@ -9,6 +9,7 @@ var Messages = Object.freeze({
     REMOVE_EMAIL: 'Please select the email to remove:',
     NO_EMAILS: 'No emails found',
     EMAIL_NOT_FOUND: 'Email not found, please try again:',
+    X_NOT_FOUND: ' -> not found',
 
     COMMAND_CANCELLED: 'Command cancelled',
     NO_ACTIVE_COMMAND: 'No active command to cancel. I go back sleeping...',

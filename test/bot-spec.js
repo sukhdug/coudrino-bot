@@ -8,6 +8,8 @@ sinon.assert.expose(chai.assert, {prefix: ''});
 
 // dependencies
 var Messages = require('../src/messages');
+var errors = require('../src/errors');
+var CloudrinoClient = require('../src/clodrino-client');
 var TelegramBot = require('node-telegram-bot-api');
 var Bluebird = require('bluebird');
 var extend = require('util')._extend;
@@ -49,10 +51,10 @@ var simulateMessage = function (bot, command) {
 };
 
 /**
- * Run a function after 300 ms.
+ * Run a function after a small delay.
  */
 var later = function (fc) {
-    setTimeout(fc, 300);
+    setTimeout(fc, 50);
 };
 
 /**
@@ -226,6 +228,57 @@ describe('bot', function () {
                     check(this.mock, done);
 
                 }.bind(this));
+            }.bind(this));
+        });
+    });
+
+    describe('/check', function () {
+        it('should print a message if there is no email to check', function () {
+            console.log('TODO... & to implement');
+        });
+        it('should check all the present emails', function (done) {
+
+            var EMAIL_OK = 'ok@example.com';
+            var EMAIL_KO = 'ko@example.com';
+
+            // stub Cloudrino Client
+            var getPositionStub = sinon.stub(CloudrinoClient.prototype, 'getPosition', function (email) {
+                return new Bluebird(function (resolve, reject) {
+                    switch (email) {
+                        case EMAIL_OK:
+                            resolve({
+                                position: 300,
+                                total: 50000
+                            });
+                            break;
+
+                        default:
+                            reject(new errors.PositionNotFound());
+                    }
+                });
+            });
+
+            // insert some emails
+            simulateMessage(bot, '/add');
+            simulateMessage(bot, EMAIL_OK);
+            simulateMessage(bot, '/add');
+            simulateMessage(bot, EMAIL_KO);
+            this.mock.expects('sendMessage').exactly(4);
+
+            later(function () {
+
+                // ... and check them
+                var messagges = ['ok@example.com -> #300 of #50000\n', 'ko@example.com -> not found\n'];
+                var regexp = new RegExp('(' + messagges[0] + '|' + messagges[1] + '){2}');
+
+                this.mock.expects('sendMessage').once().withArgs(CHAT_ID, sinon.match(regexp));
+                simulateMessage(bot, '/check');
+
+                check(this.mock, function () {
+                    getPositionStub.restore();
+                    done();
+                });
+
             }.bind(this));
         });
     });
