@@ -49,13 +49,20 @@ var simulateMessage = function (bot, command) {
 };
 
 /**
+ * Run a function after 300 ms.
+ */
+var later = function (fc) {
+    setTimeout(fc, 300);
+};
+
+/**
  * Verify a mock object after a certain amount of time.
  */
 var check = function (mock, done) {
-    setTimeout(function () {
+    later(function () {
         mock.verify();
         done();
-    }, 500);
+    });
 };
 
 
@@ -132,6 +139,36 @@ describe('bot', function () {
             this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.COMMAND_CANCELLED);
             simulateMessage(bot, '/cancel');
             check(this.mock, done);
+        });
+    });
+
+    describe('add', function () {
+        it('should add a new email address', function (done) {
+            this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.ADD_EMAIL);
+            simulateMessage(bot, '/add');
+            this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.OK);
+            simulateMessage(bot, 'new@example.com');
+            check(this.mock, done);
+        });
+        it('should not add an already present email address', function (done) {
+
+            var EMAIL = 'already-present@example.com';
+
+            // insert an email
+            simulateMessage(bot, '/add');
+            simulateMessage(bot, EMAIL);
+            this.mock.expects('sendMessage').twice();
+
+            later(function () {
+
+                // try to insert it again
+                this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.ADD_EMAIL);
+                simulateMessage(bot, '/add');
+                this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.EMAIL_ALREADY_PRESENT);
+                simulateMessage(bot, EMAIL);
+
+                check(this.mock, done);
+            }.bind(this));
         });
     });
 
