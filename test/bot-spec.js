@@ -84,15 +84,13 @@ var bot = require('../src/bot');
 // spec
 describe('bot', function () {
 
-    beforeEach(function (done) {
-
-        // clear the db before the start of the test
-        bot.reset().then(function () {
-            done();
-        });
+    beforeEach(function () {
 
         // mock the bot
         this.mock = sinon.mock(bot);
+
+        // clear the db before the start of the test
+        return bot.reset();
     });
 
     describe('#getMe() [MOCK]', function () {
