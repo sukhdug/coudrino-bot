@@ -231,6 +231,24 @@ describe('bot', function () {
     });
 
     describe('/check', function () {
+        it('should fail if Clodrino does not work properly', function (done) {
+
+            // stub Cloudrino Client
+            var getPositionStub = sinon.stub(CloudrinoClient.prototype, 'getPosition', function () {
+                return new Bluebird(function (resolve, reject) {
+                    reject(new Error('simulate a Cloudrino change'));
+                });
+            });
+
+            // test /check
+            this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.UNKNOWN_ERROR);
+            simulateMessage(bot, '/check');
+
+            check(this.mock, function () {
+                getPositionStub.restore();
+                done();
+            });
+        });
         it('should print a message if there is no email to check', function (done) {
             this.mock.expects('sendMessage').once().withArgs(CHAT_ID, Messages.NO_EMAILS);
             simulateMessage(bot, '/check');
@@ -268,8 +286,8 @@ describe('bot', function () {
             later(function () {
 
                 // ... and check them
-                var messagges = ['ok@example.com -> #300 of #50000\n', 'ko@example.com -> not found\n'];
-                var regexp = new RegExp('(' + messagges[0] + '|' + messagges[1] + '){2}');
+                var messages = ['ok@example.com -> #300 of #50000\n', 'ko@example.com -> not found\n'];
+                var regexp = new RegExp('(' + messages[0] + '|' + messages[1] + '){2}');
 
                 this.mock.expects('sendMessage').once().withArgs(CHAT_ID, sinon.match(regexp));
                 simulateMessage(bot, '/check');
