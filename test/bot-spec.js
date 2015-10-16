@@ -84,7 +84,7 @@ var bot = require('../src/bot');
 // spec
 describe('bot', function () {
 
-    beforeEach(function () {
+    beforeEach('clean bot DB & mock it for testing', function () {
 
         // mock the bot
         this.mock = sinon.mock(bot);
