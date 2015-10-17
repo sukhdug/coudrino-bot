@@ -2,11 +2,11 @@
   "name": "cloudrino-bot",
   "version": "1.0.0",
   "description": "Simple Telegram Bot to check the queue on Clodrino.",
-  "main": "src/bot.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node src/bot.js",
+    "start": "node index.js",
     "test": "./node_modules/.bin/mocha",
-    "coverage": "./node_modules/.bin/istanbul cover _mocha --include-all-sources"
+    "coverage": "./node_modules/.bin/istanbul cover _mocha test --include-all-sources"
   },
   "repository": {
     "type": "git",

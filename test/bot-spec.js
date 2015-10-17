@@ -67,19 +67,14 @@ var check = function (mock, done) {
     });
 };
 
-
-// inject a fake TOKEN for the bot
-process.env.TOKEN = 'token';
-
 // mock bot
 sinon.stub(TelegramBot.prototype, 'getMe')
     .returns(new Bluebird(function (resolve) {
         resolve(ME);
     }));
 
-// start the bot
-var bot = require('../src/bot');
-
+// start the bot (with a fake token)
+var bot = require('../src/bot')('token');
 
 // spec
 describe('bot', function () {
@@ -91,6 +86,12 @@ describe('bot', function () {
 
         // clear the db before the start of the test
         return bot.reset();
+    });
+
+    describe('missing token', function () {
+        it('should throw if no token is provided', function () {
+            assert.throws(require('../src/bot'));
+        });
     });
 
     describe('#getMe() [MOCK]', function () {

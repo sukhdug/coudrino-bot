@@ -1,12 +1,5 @@
 'use strict';
 
-// env variables
-var redisUrl = process.env.REDIS_URL;
-var token = process.env.TOKEN;
-var port = process.env.PORT || 5000;
-var webHook = process.env.WEHBOOK_URL;
-
-// dependencies
 var RedisClient = require('./redis');
 var TelegramBot = require('node-telegram-bot-api');
 var CloudrinoClient = require('./clodrino-client');
@@ -14,172 +7,181 @@ var errors = require('./errors');
 var Status = require('./status');
 var Messages = require('./messages');
 
-// check variables
-if (!token) {
-    console.error('Please add a TOKEN env variable with the TelegramBot token');
-    process.exit(1);
-}
+module.exports = function (token) {
 
-// create DB client
-var redis = new RedisClient(redisUrl);
+    // env variables
+    var redisUrl = process.env.REDIS_URL;
+    var port = process.env.PORT || 5000;
+    var webHook = process.env.WEHBOOK_URL;
 
-// create Cloudrino client
-var cloudrino = new CloudrinoClient();
 
-// set bot mode (polling vs webHook) depending ok the environment
-var options = {};
-if (webHook) {
-    options.webHook = {
-        port: port,
-        host: '0.0.0.0'
-    };
-} else {
-    options.polling = true;
-}
+    // check variables
+    if (!token) {
+        var msg = 'Please add a TOKEN env variable with the TelegramBot token';
+        console.error(msg);
+        throw new Error(msg);
+    }
 
-// create Bot
-var bot = new TelegramBot(token, options);
-if (webHook) {
-    bot.setWebHook(webHook + ':443/bot' + token);
-}
+    // create DB client
+    var redis = new RedisClient(redisUrl);
 
-// get bot name
-bot.getMe()
-    .then(function (me) {
+    // create Cloudrino client
+    var cloudrino = new CloudrinoClient();
 
-        // save bot name
-        var myName = '@' + me.username;
+    // set bot mode (polling vs webHook) depending ok the environment
+    var options = {};
+    if (webHook) {
+        options.webHook = {
+            port: port,
+            host: '0.0.0.0'
+        };
+    } else {
+        options.polling = true;
+    }
 
-        // reply to text messages
-        bot.on('text', function (msg) {
+    // create Bot
+    var bot = new TelegramBot(token, options);
+    if (webHook) {
+        bot.setWebHook(webHook + ':443/bot' + token);
+    }
 
-            // parse command (eg. /start@CloudrinoBot => /start)
-            var command = msg.text.replace(myName, '');
+    // get bot name
+    bot.getMe()
+        .then(function (me) {
 
-            // get chat id
-            var chatID = msg.chat.id;
+            // save bot name
+            var myName = '@' + me.username;
 
-            // reply
-            switch (command) {
+            // reply to text messages
+            bot.on('text', function (msg) {
 
-                // show the welcome message
-                case '/start':
-                    bot.sendMessage(chatID, Messages.WELCOME);
-                    break;
+                // parse command (eg. /start@CloudrinoBot => /start)
+                var command = msg.text.replace(myName, '');
 
-                // cancel the current command, if any
-                case '/cancel':
-                    redis.getStatus(chatID)
-                        .then(function (status) {
-                            bot.sendMessage(chatID, status === Status.DEFAULT ? Messages.NO_ACTIVE_COMMAND : Messages.COMMAND_CANCELLED);
-                        });
-                    break;
+                // get chat id
+                var chatID = msg.chat.id;
 
-                // add a new email address
-                case '/add':
-                    redis.setStatus(chatID, Status.ADD_EMAIL)
-                        .then(function () {
-                            bot.sendMessage(chatID, Messages.ADD_EMAIL);
-                        });
-                    break;
+                // reply
+                switch (command) {
 
-                // remove a email address
-                case '/remove':
-                    redis.getEmails(chatID)
-                        .then(function (emails) {
-                            if (emails.length > 0) {
-                                redis.setStatus(chatID, Status.REMOVE_EMAIL)
-                                    .then(function () {
-                                        var keyboard = emails.reduce(function (accumulator, current) {
-                                            accumulator.push([current]);
-                                            return accumulator;
-                                        }, []);
-                                        bot.sendMessage(chatID, Messages.REMOVE_EMAIL, {
-                                            reply_markup: JSON.stringify({
-                                                keyboard: keyboard,
-                                                one_time_keyboard: false
-                                            })
+                    // show the welcome message
+                    case '/start':
+                        bot.sendMessage(chatID, Messages.WELCOME);
+                        break;
+
+                    // cancel the current command, if any
+                    case '/cancel':
+                        redis.getStatus(chatID)
+                            .then(function (status) {
+                                bot.sendMessage(chatID, status === Status.DEFAULT ? Messages.NO_ACTIVE_COMMAND : Messages.COMMAND_CANCELLED);
+                            });
+                        break;
+
+                    // add a new email address
+                    case '/add':
+                        redis.setStatus(chatID, Status.ADD_EMAIL)
+                            .then(function () {
+                                bot.sendMessage(chatID, Messages.ADD_EMAIL);
+                            });
+                        break;
+
+                    // remove a email address
+                    case '/remove':
+                        redis.getEmails(chatID)
+                            .then(function (emails) {
+                                if (emails.length > 0) {
+                                    redis.setStatus(chatID, Status.REMOVE_EMAIL)
+                                        .then(function () {
+                                            var keyboard = emails.reduce(function (accumulator, current) {
+                                                accumulator.push([current]);
+                                                return accumulator;
+                                            }, []);
+                                            bot.sendMessage(chatID, Messages.REMOVE_EMAIL, {
+                                                reply_markup: JSON.stringify({
+                                                    keyboard: keyboard,
+                                                    one_time_keyboard: false
+                                                })
+                                            });
                                         });
+                                } else {
+                                    bot.sendMessage(chatID, Messages.NO_EMAILS);
+                                }
+                            });
+                        break;
+
+                    case '/check':
+                        redis.getEmails(chatID)
+                            .map(function (email) {
+                                return cloudrino.getPosition(email)
+                                    .then(function (o) {
+                                        return email + ' -> #' + o.position + ' of #' + o.total;
+                                    })
+                                    .catch(errors.PositionNotFound, function () {
+                                        return email + Messages.X_NOT_FOUND;
                                     });
-                            } else {
-                                bot.sendMessage(chatID, Messages.NO_EMAILS);
-                            }
-                        });
-                    break;
+                            })
+                            .then(function (results) {
+                                var msg = results.reduce(function (accumulator, current) {
+                                    return accumulator + current + '\n';
+                                }, '');
+                                bot.sendMessage(chatID, msg || Messages.NO_EMAILS);
+                            })
+                            .catch(function () {
+                                bot.sendMessage(chatID, Messages.UNKNOWN_ERROR);
+                            });
 
-                case '/check':
-                    redis.getEmails(chatID)
-                        .map(function (email) {
-                            return cloudrino.getPosition(email)
-                                .then(function (o) {
-                                    return email + ' -> #' + o.position + ' of #' + o.total;
-                                })
-                                .catch(errors.PositionNotFound, function () {
-                                    return email + Messages.X_NOT_FOUND;
-                                });
-                        })
-                        .then(function (results) {
-                            var msg = results.reduce(function (accumulator, current) {
-                                return accumulator + current + '\n';
-                            }, '');
-                            bot.sendMessage(chatID, msg || Messages.NO_EMAILS);
-                        })
-                        .catch(function () {
-                            bot.sendMessage(chatID, Messages.UNKNOWN_ERROR);
-                        });
+                        break;
 
-                    break;
+                    default:
+                        redis.getStatus(chatID)
+                            .then(function (status) {
+                                switch (status) {
 
-                default:
-                    redis.getStatus(chatID)
-                        .then(function (status) {
-                            switch (status) {
-
-                                case Status.ADD_EMAIL:
-                                    redis.addEmail(chatID, msg.text)
-                                        .then(function (added) {
-                                            bot.sendMessage(chatID, added ? Messages.OK : Messages.EMAIL_ALREADY_PRESENT);
-                                            redis.setStatus(chatID, Status.DEFAULT);
-                                        });
-                                    break;
-
-                                case Status.REMOVE_EMAIL:
-                                    redis.removeEmail(chatID, msg.text)
-                                        .then(function (removed) {
-                                            if (removed) {
-                                                bot.sendMessage(chatID, Messages.OK, {
-                                                    reply_markup: JSON.stringify({
-                                                        hide_keyboard: true
-                                                    })
-                                                });
+                                    case Status.ADD_EMAIL:
+                                        redis.addEmail(chatID, msg.text)
+                                            .then(function (added) {
+                                                bot.sendMessage(chatID, added ? Messages.OK : Messages.EMAIL_ALREADY_PRESENT);
                                                 redis.setStatus(chatID, Status.DEFAULT);
-                                            } else {
-                                                bot.sendMessage(chatID, Messages.EMAIL_NOT_FOUND);
-                                            }
-                                        });
-                                    break;
+                                            });
+                                        break;
 
-                                default:
-                                    if (new RegExp('^\/([^@])*((' + me.username + ')\s*.*)?$').test(command)) {
-                                        bot.sendMessage(chatID, Messages.UNKNOWN_COMMAND);
-                                    }
-                            }
-                        });
-            }
+                                    case Status.REMOVE_EMAIL:
+                                        redis.removeEmail(chatID, msg.text)
+                                            .then(function (removed) {
+                                                if (removed) {
+                                                    bot.sendMessage(chatID, Messages.OK, {
+                                                        reply_markup: JSON.stringify({
+                                                            hide_keyboard: true
+                                                        })
+                                                    });
+                                                    redis.setStatus(chatID, Status.DEFAULT);
+                                                } else {
+                                                    bot.sendMessage(chatID, Messages.EMAIL_NOT_FOUND);
+                                                }
+                                            });
+                                        break;
+
+                                    default:
+                                        if (new RegExp('^\/([^@])*((' + me.username + ')\s*.*)?$').test(command)) {
+                                            bot.sendMessage(chatID, Messages.UNKNOWN_COMMAND);
+                                        }
+                                }
+                            });
+                }
+            });
+
+            // debug message
+            console.info('# running... Press Ctrl+C to exit'.replace('#', myName));
+        })
+        .catch(function () {
+            console.error('Error starting the Bot... maybe the TOKEN is wrong?');
+            process.exit(1);
         });
 
-        // debug message
-        console.info('# running... Press Ctrl+C to exit'.replace('#', myName));
-    })
-    .catch(function () {
-        console.error('Error starting the Bot... maybe the TOKEN is wrong?');
-        process.exit(1);
-    });
+    // add function to reset the bot
+    bot.reset = function () {
+        return redis.clear();
+    };
 
-// add function to reset the bot
-bot.reset = function () {
-    return redis.clear();
+    return bot;
 };
-
-// export the bot for tests
-module.exports = bot;

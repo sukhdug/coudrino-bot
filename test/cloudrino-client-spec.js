@@ -4,7 +4,7 @@ var chai = require('chai'),
     assert = chai.assert;
 
 // port to be used for the test
-var PORT = 22222;
+var PORT = process.env.TEST_PORT || 22222;
 
 // dependencies
 var CloudrinoClient = require('../src/clodrino-client');
