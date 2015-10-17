@@ -68,10 +68,15 @@ var check = function (mock, done) {
 };
 
 // mock bot
-sinon.stub(TelegramBot.prototype, 'getMe')
-    .returns(new Bluebird(function (resolve) {
-        resolve(ME);
-    }));
+var getMeStub = sinon.stub(TelegramBot.prototype, 'getMe', function (fail) {
+    return new Bluebird(function (resolve, reject) {
+        if (!fail) {
+            resolve(ME);
+        } else {
+            reject(new Error('Simulare wrong token'));
+        }
+    });
+});
 
 // start the bot (with a fake token)
 var bot = require('../src/bot')('token');
