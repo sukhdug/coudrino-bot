@@ -68,7 +68,7 @@ var check = function (mock, done) {
 };
 
 // mock bot
-var getMeStub = sinon.stub(TelegramBot.prototype, 'getMe', function (fail) {
+sinon.stub(TelegramBot.prototype, 'getMe', function (fail) {
     return new Bluebird(function (resolve, reject) {
         if (!fail) {
             resolve(ME);
