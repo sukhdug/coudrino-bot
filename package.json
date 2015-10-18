@@ -34,7 +34,7 @@
     "codeclimate-test-reporter": "^0.1.1",
     "coveralls": "^2.11.4",
     "express": "^4.13.3",
-    "istanbul": "^0.3.22",
+    "istanbul": "^0.4.0",
     "mocha": "^2.3.3",
     "sinon": "^1.17.1",
     "validator": "^4.1.0"
