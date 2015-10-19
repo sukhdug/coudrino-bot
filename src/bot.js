@@ -7,43 +7,42 @@ var errors = require('./errors');
 var Status = require('./status');
 var Messages = require('./messages');
 
-module.exports = function (token) {
+// helper function -> exit with error
+var exit = function (msg) {
+    console.error(msg);
+    throw new Error(msg);
+};
 
-    // helper function -> exit with error
-    var exit = function (msg) {
-        console.error(msg);
-        throw new Error(msg);
-    };
-
-    // env variables
-    var redisUrl = process.env.REDIS_URL;
-    var port = process.env.PORT || 5000;
-    var webHook = process.env.WEHBOOK_URL;
+module.exports = function (token, options) {
+    options = options || {};
 
     // check variables
     if (!token) {
         exit('Please add a TOKEN env variable with the TelegramBot token');
     }
 
+    // check if the bot should use a webHook
+    var webHook = options.webHook;
+
     // create DB client
-    var redis = new RedisClient(redisUrl);
+    var redis = new RedisClient(options.redisUrl);
 
     // create Cloudrino client
     var cloudrino = new CloudrinoClient();
 
     // set bot mode (polling vs webHook) depending ok the environment
-    var options = {};
+    var botOptions = {};
     if (webHook) {
-        options.webHook = {
-            port: port,
+        botOptions.webHook = {
+            port: options.port || 5000,
             host: '0.0.0.0'
         };
     } else {
-        options.polling = true;
+        botOptions.polling = true;
     }
 
     // create Bot
-    var bot = new TelegramBot(token, options);
+    var bot = new TelegramBot(token, botOptions);
     if (webHook) {
         bot.setWebHook(webHook + ':443/bot' + token);
     }

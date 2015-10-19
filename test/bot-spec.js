@@ -74,6 +74,7 @@ sinon.stub(TelegramBot.prototype, 'getMe', function () {
     });
 });
 
+
 // start the bot (with a fake token)
 var bot = require('../src/bot')('token');
 
@@ -87,6 +88,13 @@ describe('bot', function () {
 
         // clear the db before the start of the test
         return bot.reset();
+    });
+
+    describe('webHook options', function () {
+        it('should use a webHook instead of polling if the bot is created with this option', function () {
+            var webHookMock = require('../src/bot')('token', {webHook: 'https://fake.io'});
+            assert(webHookMock.options.webHook);
+        });
     });
 
     describe('missing token', function () {
