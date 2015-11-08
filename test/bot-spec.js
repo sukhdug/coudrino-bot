@@ -54,7 +54,7 @@ var simulateMessage = function (bot, command) {
  * Run a function after a small delay.
  */
 var later = function (fc) {
-    setTimeout(fc, 50);
+    setTimeout(fc, 150);
 };
 
 /**
