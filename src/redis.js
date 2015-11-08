@@ -23,10 +23,9 @@ RedisClient.prototype.clear = function () {
 };
 
 RedisClient.prototype.getStatus = function (chat) {
-    return this.client.getAsync(STATUS + chat)
-        .then(function (status) {
-            return status || Status.DEFAULT;
-        });
+    return this.client.getAsync(STATUS + chat).then(function (status) {
+        return status || Status.DEFAULT;
+    });
 };
 
 RedisClient.prototype.setStatus = function (chat, status) {
@@ -34,17 +33,15 @@ RedisClient.prototype.setStatus = function (chat, status) {
 };
 
 RedisClient.prototype.addEmail = function (user, email) {
-    return this.client.saddAsync(EMAILS + user, email)
-        .then(function (number) {
-            return number ? true : false;
-        });
+    return this.client.saddAsync(EMAILS + user, email).then(function (number) {
+        return number ? true : false;
+    });
 };
 
 RedisClient.prototype.removeEmail = function (user, email) {
-    return this.client.sremAsync(EMAILS + user, email)
-        .then(function (number) {
-            return number ? true : false;
-        });
+    return this.client.sremAsync(EMAILS + user, email).then(function (number) {
+        return number ? true : false;
+    });
 };
 
 RedisClient.prototype.getEmails = function (user) {

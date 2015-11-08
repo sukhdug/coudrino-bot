@@ -26,21 +26,19 @@ CloudrinoClient.prototype._doRequest = function (email) {
         method: 'GET'
     };
 
-    return request(options)
-        .then(function (response) {
-            if (response.statusCode >= 400) {
-                throw new Error('HTTP error: ' + response.statusCode);
-            }
-            return response.body;
-        });
+    return request(options).then(function (response) {
+        if (response.statusCode >= 400) {
+            throw new Error('HTTP error: ' + response.statusCode);
+        }
+        return response.body;
+    });
 };
 
 CloudrinoClient.prototype.getPosition = function (email) {
     var self = this;
-    return self._doRequest(email)
-        .then(function (body) {
-            return self._transformResponse(body);
-        });
+    return self._doRequest(email).then(function (body) {
+        return self._transformResponse(body);
+    });
 };
 
 

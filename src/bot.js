@@ -72,102 +72,90 @@ module.exports = function (token, options) {
 
                 // cancel the current command, if any
                 case '/cancel':
-                    redis.getStatus(chatID)
-                        .then(function (status) {
-                            bot.sendMessage(chatID, status === Status.DEFAULT ? Messages.NO_ACTIVE_COMMAND : Messages.COMMAND_CANCELLED);
-                        });
+                    redis.getStatus(chatID).then(function (status) {
+                        bot.sendMessage(chatID, status === Status.DEFAULT ? Messages.NO_ACTIVE_COMMAND : Messages.COMMAND_CANCELLED);
+                    });
                     break;
 
                 // add a new email address
                 case '/add':
-                    redis.setStatus(chatID, Status.ADD_EMAIL)
-                        .then(function () {
-                            bot.sendMessage(chatID, Messages.ADD_EMAIL);
-                        });
+                    redis.setStatus(chatID, Status.ADD_EMAIL).then(function () {
+                        bot.sendMessage(chatID, Messages.ADD_EMAIL);
+                    });
                     break;
 
                 // remove a email address
                 case '/remove':
-                    redis.getEmails(chatID)
-                        .then(function (emails) {
-                            if (emails.length > 0) {
-                                redis.setStatus(chatID, Status.REMOVE_EMAIL)
-                                    .then(function () {
-                                        var keyboard = emails.reduce(function (accumulator, current) {
-                                            accumulator.push([current]);
-                                            return accumulator;
-                                        }, []);
-                                        bot.sendMessage(chatID, Messages.REMOVE_EMAIL, {
-                                            reply_markup: JSON.stringify({
-                                                keyboard: keyboard,
-                                                one_time_keyboard: false
-                                            })
-                                        });
-                                    });
-                            } else {
-                                bot.sendMessage(chatID, Messages.NO_EMAILS);
-                            }
-                        });
+                    redis.getEmails(chatID).then(function (emails) {
+                        if (emails.length > 0) {
+                            redis.setStatus(chatID, Status.REMOVE_EMAIL).then(function () {
+                                var keyboard = emails.reduce(function (accumulator, current) {
+                                    accumulator.push([current]);
+                                    return accumulator;
+                                }, []);
+                                bot.sendMessage(chatID, Messages.REMOVE_EMAIL, {
+                                    reply_markup: JSON.stringify({
+                                        keyboard: keyboard,
+                                        one_time_keyboard: false
+                                    })
+                                });
+                            });
+                        } else {
+                            bot.sendMessage(chatID, Messages.NO_EMAILS);
+                        }
+                    });
                     break;
 
                 case '/check':
-                    redis.getEmails(chatID)
-                        .map(function (email) {
-                            return cloudrino.getPosition(email)
-                                .then(function (o) {
-                                    return email + ' -> #' + o.position + ' of #' + o.total;
-                                })
-                                .catch(errors.PositionNotFound, function () {
-                                    return email + Messages.X_NOT_FOUND;
-                                });
-                        })
-                        .then(function (results) {
-                            var msg = results.reduce(function (accumulator, current) {
-                                return accumulator + current + '\n';
-                            }, '');
-                            bot.sendMessage(chatID, msg || Messages.NO_EMAILS);
-                        })
-                        .catch(function () {
-                            bot.sendMessage(chatID, Messages.UNKNOWN_ERROR);
+                    redis.getEmails(chatID).map(function (email) {
+                        return cloudrino.getPosition(email).then(function (o) {
+                            return email + ' -> #' + o.position + ' of #' + o.total;
+                        }).catch(errors.PositionNotFound, function () {
+                            return email + Messages.X_NOT_FOUND;
                         });
+                    }).then(function (results) {
+                        var msg = results.reduce(function (accumulator, current) {
+                            return accumulator + current + '\n';
+                        }, '');
+                        bot.sendMessage(chatID, msg || Messages.NO_EMAILS);
+                    }).catch(function () {
+                        bot.sendMessage(chatID, Messages.UNKNOWN_ERROR);
+                    });
 
                     break;
 
                 default:
-                    redis.getStatus(chatID)
-                        .then(function (status) {
-                            switch (status) {
+                    redis.getStatus(chatID).then(function (status) {
+                        switch (status) {
 
-                                case Status.ADD_EMAIL:
-                                    redis.addEmail(chatID, msg.text)
-                                        .then(function (added) {
-                                            bot.sendMessage(chatID, added ? Messages.OK : Messages.EMAIL_ALREADY_PRESENT);
-                                            redis.setStatus(chatID, Status.DEFAULT);
+                            case Status.ADD_EMAIL:
+                                redis.addEmail(chatID, msg.text).then(function (added) {
+                                    bot.sendMessage(chatID, added ? Messages.OK : Messages.EMAIL_ALREADY_PRESENT);
+                                    redis.setStatus(chatID, Status.DEFAULT);
+                                });
+                                break;
+
+                            case Status.REMOVE_EMAIL:
+                                redis.removeEmail(chatID, msg.text).then(function (removed) {
+                                    if (removed) {
+                                        bot.sendMessage(chatID, Messages.OK, {
+                                            reply_markup: JSON.stringify({
+                                                hide_keyboard: true
+                                            })
                                         });
-                                    break;
-
-                                case Status.REMOVE_EMAIL:
-                                    redis.removeEmail(chatID, msg.text)
-                                        .then(function (removed) {
-                                            if (removed) {
-                                                bot.sendMessage(chatID, Messages.OK, {
-                                                    reply_markup: JSON.stringify({
-                                                        hide_keyboard: true
-                                                    })
-                                                });
-                                                redis.setStatus(chatID, Status.DEFAULT);
-                                            } else {
-                                                bot.sendMessage(chatID, Messages.EMAIL_NOT_FOUND);
-                                            }
-                                        });
-                                    break;
-
-                                default:
-                                    if (new RegExp('^\/([^@])*((' + me.username + ')\s*.*)?$').test(command)) {
-                                        bot.sendMessage(chatID, Messages.UNKNOWN_COMMAND);
+                                        redis.setStatus(chatID, Status.DEFAULT);
+                                    } else {
+                                        bot.sendMessage(chatID, Messages.EMAIL_NOT_FOUND);
                                     }
-                            }
-                        });
+                                });
+                                break;
+
+                            default:
+                                if (new RegExp('^\/([^@])*((' + me.username + ')\s*.*)?$').test(command)) {
+                                    bot.sendMessage(chatID, Messages.UNKNOWN_COMMAND);
+                                }
+                        }
+                    });
             }
         });
 
