@@ -94,10 +94,10 @@ module.exports = function (token, options) {
                                     return accumulator;
                                 }, []);
                                 bot.sendMessage(chatID, Messages.REMOVE_EMAIL, {
-                                    reply_markup: JSON.stringify({
+                                    reply_markup: {
                                         keyboard: keyboard,
                                         one_time_keyboard: false
-                                    })
+                                    }
                                 });
                             });
                         } else {
@@ -139,9 +139,9 @@ module.exports = function (token, options) {
                                 redis.removeEmail(chatID, msg.text).then(function (removed) {
                                     if (removed) {
                                         bot.sendMessage(chatID, Messages.OK, {
-                                            reply_markup: JSON.stringify({
+                                            reply_markup: {
                                                 hide_keyboard: true
-                                            })
+                                            }
                                         });
                                         redis.setStatus(chatID, Status.DEFAULT);
                                     } else {
